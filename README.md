@@ -1,2 +1,5 @@
 # social-capital
-Role of Social Capital in Promoting Economic Recovery 
+
+
+## getting started 
+1. create a folder named "data" and grab  `coreco.core2017co_full990.csv` &  `coreco.core2017pc_full990.csv` from disasters-and-social-capital/data/nccs/ on Drive
