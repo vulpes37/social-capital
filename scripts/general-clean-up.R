@@ -73,6 +73,26 @@ clean_bea <- function() {
   
 }
 
+aggregate_la_births <- function() {
+  
+  dat <- read.csv("la_births_deaths/la_births.csv", stringsAsFactors = FALSE, check.names = F )
+  
+  # make date variable from integer Delivery Date (del_date)
+  dat$del_date <- paste("00", c(dat$del_date), sep="")
+  dat$del_date <- as.Date(substr(dat$del_date, start=nchar(dat$del_date)-5, stop=nchar(dat$del_date)),
+                           format="%m%d%y")
+  dat$del_year_month <- format(dat$del_date, format="%Y-%m")
+  
+  # counstruct fipscode from residence parish (res_par1)
+  dat$fips <- paste("00", c(dat$res_par1), sep="")
+  dat$fips <- paste("22", substr(dat$fips, start=nchar(dat$fips)-2, stop=nchar(dat$fips)), sep="")
+  
+  # aggregate by fips and month
+  births_by_fips_month <- aggregate(dat$livebirth, by=list(dat$del_year_month, dat$fips), FUN=length)
+  names(births_by_fips_month) <- c("year_month", "fips", "num_births")
+  write.csv(births_by_fips_month, "la_births_deaths/la_births_fips_month.csv", row.names = FALSE)
+
+}
 
 # pull out orleans from nccs data 
 # nccs_orleans()
@@ -84,4 +104,7 @@ clean_bea <- function() {
 
 # clean la bea file
 # clean_bea()
+
+# aggregate la_births.csv by fips and month
+# aggregate_la_births()
   
