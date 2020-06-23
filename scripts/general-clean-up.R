@@ -11,12 +11,13 @@ library(reshape2)
 # SET YOUR DIRECTORY ----
 cd <- "~/social-capital"
 cd_data <- paste(cd, "data", sep=.Platform$file.sep)
-setwd(cd_data)
 # **********************************************************************
 
 nccs_orleans <- function() {
+  
+  cd_nccs <- paste(cd_data, "nccs", "raw", sep=.Platform$file.sep)
 
-  fileNames <- list.files(pattern = "\\.csv$")
+  fileNames <- list.files(path=cd_nccs, pattern = "\\.csv$")
   start_i <- 1
   dat <- read.csv( fileNames[start_i], stringsAsFactors = FALSE )
   year <- as.integer( substr(fileNames[start_i], 10, 13) )
@@ -45,37 +46,42 @@ nccs_orleans <- function() {
 
     dat <- rbind(dat, temp)
   }
-  
-  write.csv("nccs_orleans.csv", row.names = FALSE)  
+  save_clean <- paste(cd_data, "nccs","nccs_orleans.csv", sep=.Platform$file.sep)
+  write.csv(save_clean, row.names = FALSE)  
 
 }
 
 compare_fwf_dta <- function() {
-  
-  dta <- read.dta13("la_births_deaths/LA_Births.dta")
-  bf_widths <- read.csv("la_births_deaths/B9909_widths.csv")
-  bf <- read.fwf("la_births_deaths/B9909", widths=bf_widths["width"])
+  cd_births <- paste(cd_data, "la_births_deaths", sep=.Platform$file.sep)
+
+  dta <- read.dta13(paste(cd_births, "LA_Births.dta", sep=.Platform$file.sep))
+  bf_widths <- read.csv(paste(cd_births, "B9909_widths.csv", sep=.Platform$file.sep))
+  bf <- read.fwf(paste(cd_births, "B9909", sep=.Platform$file.sep), widths=bf_widths["width"])
   print( paste('LA_Births.dta shape:', nrow(dta), 'rows,', ncol(dta), 'cols.', sep = " ") )
   print( paste('B9909.txt shape:', nrow(bf), 'rows,', ncol(bf), 'cols.', sep = " ") )
   
 } 
 
 clean_bea <- function() {
-  
-  dat <- read.csv("la_bea_raw.csv", stringsAsFactors = FALSE, check.names = F )
+  cd_bea <- paste(cd_data, "bea", sep=.Platform$file.sep)
+  dat <- read.csv(paste(cd_bea, "la_bea_raw.csv", sep=.Platform$file.sep), stringsAsFactors = FALSE, check.names = F )
   dat <- dat[!is.na(dat$LineCode), ]
   dat <- melt(data=dat, id.vars = c("GeoFips", "GeoName", "LineCode", "Description"))
   names(dat) <- c("fips", "name", "code", "var", "year", "value")
   dat <- dat[ , names(dat)!="code"]
   dat <- dcast(data=dat, fips + name + year  ~ var, value.var = "value" )
   names(dat) <- c("fips", "name", "year", "total_wages", "total_pop", "total_inc", "total_emp")
-  write.csv(dat, "la_bea_clean.csv", row.names = FALSE) 
+  write.csv(dat, paste(cd_bea, "la_bea_clean.csv", sep=.Platform$file.sep), row.names = FALSE) 
   
 }
 
 aggregate_la_births <- function() {
   
-  dat <- read.csv("la_births_deaths/la_births.csv", stringsAsFactors = FALSE, check.names = F )
+  cd_births <- paste(cd_data, "la_births_deaths", sep=.Platform$file.sep)
+  dat <- read.csv(paste(cd_births, "la_births.csv", sep=.Platform$file.sep), stringsAsFactors = FALSE, check.names = F )
+
+  # residents of Louisiana
+  dat <- dat[dat$m_state== 19, ] 
   
   # make date variable from integer Delivery Date (del_date)
   dat$del_date <- paste("00", c(dat$del_date), sep="")
@@ -83,15 +89,18 @@ aggregate_la_births <- function() {
                            format="%m%d%y")
   dat$del_year_month <- format(dat$del_date, format="%Y-%m")
   
-  # counstruct fipscode from residence parish (res_par1)
-  dat$fips <- paste("00", c(dat$res_par1), sep="")
-  dat$fips <- paste("22", substr(dat$fips, start=nchar(dat$fips)-2, stop=nchar(dat$fips)), sep="")
-  
-  # aggregate by fips and month
-  births_by_fips_month <- aggregate(dat$livebirth, by=list(dat$del_year_month, dat$fips), FUN=length)
-  names(births_by_fips_month) <- c("year_month", "fips", "num_births")
-  write.csv(births_by_fips_month, "la_births_deaths/la_births_fips_month.csv", row.names = FALSE)
+  # id variable 
+  dat$id <- dat$res_par1
 
+  # aggregate by id and month
+  births_by_id_month <- aggregate(data=dat, livebirth ~ del_year_month + id, FUN="sum") 
+  names(births_by_id_month) <- c("year_month", "id", "num_births")
+  write.csv(births_by_id_month, paste(cd_births, "births_by_id_month.csv", sep=.Platform$file.sep), row.names = FALSE)
+  
+  # aggregate by zipcode and month
+  births_by_zip_month <- aggregate(data=dat, livebirth ~ del_year_month + id + m_zip5, FUN="sum") 
+  names(births_by_zip_month) <- c("year_month","id", "zip", "num_births")
+  write.csv(births_by_zip_month, paste(cd_births, "births_by_zip_month.csv", sep=.Platform$file.sep), row.names = FALSE)
 }
 
 # pull out orleans from nccs data 
