@@ -26,6 +26,7 @@ population_corr <- function(year) {
   crosswalk <- unique(pop[ , c("fips", "name")])
   crosswalk <- crosswalk[crosswalk$fips!=22000, ]
   crosswalk$id <- 1:64
+  write.csv(crosswalk, paste(cd_data , "la_births_deaths", "crosswalk.csv", sep=.Platform$file.sep), row.names = F)
   
   # merge with fipscode
   pop <- merge(pop, crosswalk, by=c("fips", "name"))
@@ -33,7 +34,7 @@ population_corr <- function(year) {
   # aggregate numbirths by year
   dat$year <- substr(dat$year_month,1,4)
   dat <- aggregate(data=dat, num_births ~ year + id, FUN = "sum")
-  
+
   # merge with population data 
   dat <- merge(pop, dat, by=c("year", "id"))
   dat <- dat[order(dat$fips, dat$year), ]
@@ -43,7 +44,7 @@ population_corr <- function(year) {
   dat$pop_log <- log(dat$total_pop)
   dat$emp_log <- log(dat$total_emp)
   dat$births_log <- log(dat$num_births)
-  
+
   if(year=="all"){
     temp <- dat
   }else{
@@ -62,6 +63,9 @@ population_corr <- function(year) {
       text = element_text(family = "Montserrat"),
       axis.text =  element_text(family = "Montserrat"),
       axis.line = element_line())
+  
+  x <- lm(data=temp, pop_log~births_log)
+  print(summary(x))
   
   file_name <- paste0("pop_births_correlation_log_", year, ".png")
   ggsave(paste(cd,file_name, sep=.Platform$file.sep), width=10, height=7)

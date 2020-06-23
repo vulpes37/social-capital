@@ -80,12 +80,15 @@ aggregate_la_births <- function() {
   cd_births <- paste(cd_data, "la_births_deaths", sep=.Platform$file.sep)
   dat <- read.csv(paste(cd_births, "la_births.csv", sep=.Platform$file.sep), stringsAsFactors = FALSE, check.names = F )
   
+  # residents of Louisiana
+  dat <- dat[dat$m_state== 19, ] 
+  
   # make date variable from integer Delivery Date (del_date)
   dat$del_date <- paste("00", c(dat$del_date), sep="")
   dat$del_date <- as.Date(substr(dat$del_date, start=nchar(dat$del_date)-5, stop=nchar(dat$del_date)),
                            format="%m%d%y")
   dat$del_year_month <- format(dat$del_date, format="%Y-%m")
-
+  
   # id variable 
   dat$id <- dat$res_par1
 
