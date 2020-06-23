@@ -8,6 +8,8 @@ rm(list=ls())
 library(reshape2)
 library(ggplot2)
 library(scales)
+library(gridExtra)
+library(extrafont)
 
 # SET YOUR DIRECTORY ----
 cd <- "~/social-capital"
@@ -19,7 +21,7 @@ population_corr <- function(year) {
   # Or the string year="all" to plot all years 
   
   # load data
-  dat <- read.csv(paste(cd_data , "la_births_deaths", "la_births_fips_month.csv", sep=.Platform$file.sep), stringsAsFactors = F)                 
+  dat <- read.csv(paste(cd_data , "la_births_deaths", "births_by_id_month.csv", sep=.Platform$file.sep), stringsAsFactors = F)                 
   pop <- read.csv(paste(cd_data , "bea", "la_bea_clean.csv", sep=.Platform$file.sep), stringsAsFactors = F)                 
   
   # crosswalk fips to id variable
@@ -72,8 +74,52 @@ population_corr <- function(year) {
   ggsave(paste(cd,file_name, sep=.Platform$file.sep), width=10, height=7)
   
 }
-  
 
-population_corr(2004)
-population_corr(2009)
-population_corr("all")
+
+county_timeseries <- function(){
+  
+  # load data
+  dat <- read.csv(paste(cd_data , "la_births_deaths", "births_by_id_month.csv", sep=.Platform$file.sep), stringsAsFactors = F)                 
+  pop <- read.csv(paste(cd_data , "bea", "la_bea_clean.csv", sep=.Platform$file.sep), stringsAsFactors = F)                 
+  
+  # crosswalk fips to id variable
+  crosswalk <- unique(pop[ , c("fips", "name")])
+  crosswalk <- crosswalk[crosswalk$fips!=22000, ]
+  crosswalk$id <- 1:64
+  
+  # merge with fipscode
+  dat <- merge(dat, crosswalk, by=c("id"))
+
+  # subset
+  trt <- c("22051","22071","22075","22087", "22089", "22103")
+  
+  ts_plot <- function(trt){
+    
+    temp <- dat[dat$fips==trt, ]
+    label <- dat[dat$fips==trt, "name"]
+    temp$time <- 1:nrow(temp)
+    
+    ggplot(data = temp, aes(time, num_births)) +
+      geom_vline(xintercept=temp[ temp$year_month == "2005-08", "time" ], color="#A6CFEB", size=0.8) +
+      geom_line(color="#162530", size=0.6) + 
+      xlab("Month") +
+      ylab("Live Births") + 
+      scale_y_continuous(labels=scales::comma) + 
+      ggtitle(label) +
+      theme_minimal() + 
+      theme(
+        text = element_text(family = "Montserrat"),
+        axis.text =  element_text(family = "Montserrat"),
+        axis.line = element_line())
+  }
+  
+  
+  png(paste(cd,"county_timeseries.png", sep=.Platform$file.sep), width = 12, height = 10, units = "in", res=300 )
+  grid.arrange( ts_plot(trt[1]), ts_plot(trt[2]),
+                ts_plot(trt[3]), ts_plot(trt[4]),
+                ts_plot(trt[5]), ts_plot(trt[6]),
+                ncol =2 ) 
+  dev.off()
+}  
+
+
