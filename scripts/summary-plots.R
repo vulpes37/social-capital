@@ -40,11 +40,13 @@ population_corr <- function(year) {
   dat <- dat[order(dat$fips, dat$year), ]
   dat <- dat[ , c("id", "fips", "name", "year", "total_pop", "total_emp", "num_births")]
   
+  
   # log variables 
   dat$pop_log <- log(dat$total_pop)
   dat$emp_log <- log(dat$total_emp)
   dat$births_log <- log(dat$num_births)
 
+    year  <- "all"
   if(year=="all"){
     temp <- dat
   }else{
@@ -64,7 +66,7 @@ population_corr <- function(year) {
       # axis.text =  element_text(family = "Montserrat"),
       axis.line = element_line())
   
-  x <- lm(data=temp, pop_log~births_log)
+  x <- lm(data=temp, emp_log~births_log)
   print(summary(x))
   
   file_name <- paste0("pop_births_correlation_log_", year, ".png")
