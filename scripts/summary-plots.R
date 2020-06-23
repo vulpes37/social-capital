@@ -101,7 +101,7 @@ county_timeseries <- function(){
     
     ggplot(data = temp, aes(time, num_births)) +
       geom_vline(xintercept=temp[ temp$year_month == "2005-08", "time" ], color="#A6CFEB", size=0.8) +
-      geom_line(color="#162530", size=0.6) + 
+      geom_line(color="#162530", size=0.5) + 
       xlab("Month") +
       ylab("Live Births") + 
       scale_y_continuous(labels=scales::comma) + 
@@ -122,7 +122,59 @@ county_timeseries <- function(){
   dev.off()
 }  
 
+
+county_zip <- function(){
+  
+  # load data
+  dat <- read.csv(paste(cd_data , "la_births_deaths", "births_by_zip_month.csv", sep=.Platform$file.sep), stringsAsFactors = F)
+  dam <- read.csv(paste(cd_data , "damages", "damages_summary.csv", sep=.Platform$file.sep), stringsAsFactors = F)
+  
+  zipcode <- dam$zip
+  dat <- dat[ dat$zip %in% zipcode, ]
+  
+  ts_plot <- function(trt){
+    
+    temp <- dat[dat$zip==trt, ]
+    label <- trt
+    temp$time <- 1:nrow(temp)
+    
+    ggplot(data = temp, aes(time, num_births)) +
+      geom_vline(xintercept=temp[ temp$year_month == "2005-08", "time" ], color="#A6CFEB", size=0.8) +
+      geom_line(color="#162530", size=0.5) + 
+      xlab("Month") +
+      ylab("Live Births") + 
+      scale_y_continuous(labels=scales::comma) + 
+      ggtitle(label) +
+      theme_minimal() + 
+      theme(
+        # text = element_text(family = "Montserrat"),
+        # axis.text =  element_text(family = "Montserrat"),
+        axis.line = element_line())
+  }
+  
+  
+  png(paste(cd,"zipcode_1.png", sep=.Platform$file.sep), width = 12, height = 10, units = "in", res=300 )
+  grid.arrange( ts_plot(zipcode[1]), ts_plot(zipcode[2]),
+                ts_plot(zipcode[3]), ts_plot(zipcode[4]),
+                ts_plot(zipcode[5]), ts_plot(zipcode[6]),
+                ncol =2 ) 
+  dev.off()
+  png(paste(cd,"zipcode_2.png", sep=.Platform$file.sep), width = 12, height = 10, units = "in", res=300 )
+  grid.arrange( ts_plot(zipcode[7]), ts_plot(zipcode[8]),
+                ts_plot(zipcode[9]), ts_plot(zipcode[10]),
+                ts_plot(zipcode[11]), ts_plot(zipcode[12]),
+                ncol =2 ) 
+  dev.off()
+  png(paste(cd,"zipcode_3.png", sep=.Platform$file.sep), width = 12, height = 6.7, units = "in", res=300 )
+  grid.arrange( ts_plot(zipcode[13]), ts_plot(zipcode[14]),
+                ts_plot(zipcode[15]), ncol =2 ) 
+  dev.off()
+  
+}  
+
+
 #  call plots
 population_corr(2004)	
 population_corr("all")
 county_timeseries()
+county_zip()
