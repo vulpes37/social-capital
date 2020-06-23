@@ -98,8 +98,8 @@ aggregate_la_births <- function() {
   write.csv(births_by_id_month, paste(cd_births, "births_by_id_month.csv", sep=.Platform$file.sep), row.names = FALSE)
   
   # aggregate by zipcode and month
-  births_by_zip_month <- aggregate(data=dat, livebirth ~ del_year_month + m_zip5 + id, FUN="sum") 
-  names(births_by_zip_month) <- c("year_month", "zip", "num_births")
+  births_by_zip_month <- aggregate(data=dat, livebirth ~ del_year_month + id + m_zip5, FUN="sum") 
+  names(births_by_zip_month) <- c("year_month","id", "zip", "num_births")
   write.csv(births_by_zip_month, paste(cd_births, "births_by_zip_month.csv", sep=.Platform$file.sep), row.names = FALSE)
 }
 
