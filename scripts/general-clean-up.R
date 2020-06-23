@@ -46,7 +46,7 @@ nccs_orleans <- function() {
 
     dat <- rbind(dat, temp)
   }
-  save_clean <-   cd_nccs <- paste(cd_data, "nccs","nccs_orleans.csv", sep=.Platform$file.sep)
+  save_clean <- paste(cd_data, "nccs","nccs_orleans.csv", sep=.Platform$file.sep)
   write.csv(save_clean, row.names = FALSE)  
 
 }
