@@ -9,7 +9,7 @@ library(reshape2)
 library(ggplot2)
 library(scales)
 library(gridExtra)
-library(extrafont)
+# library(extrafont)
 
 # SET YOUR DIRECTORY ----
 cd <- "~/social-capital"
@@ -108,8 +108,8 @@ county_timeseries <- function(){
       ggtitle(label) +
       theme_minimal() + 
       theme(
-        text = element_text(family = "Montserrat"),
-        axis.text =  element_text(family = "Montserrat"),
+        # text = element_text(family = "Montserrat"),
+        # axis.text =  element_text(family = "Montserrat"),
         axis.line = element_line())
   }
   
