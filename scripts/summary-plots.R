@@ -15,6 +15,8 @@ cd_data <- paste(cd, "data", sep=.Platform$file.sep)
 # **********************************************************************
 
 population_corr <- function(year) {
+  # Takes either an integer for the year you want to plot, ex year=2004 
+  # Or the string year="all" to plot all years 
   
   # load data
   dat <- read.csv(paste(cd_data , "la_births_deaths", "la_births_fips_month.csv", sep=.Platform$file.sep), stringsAsFactors = F)                 
