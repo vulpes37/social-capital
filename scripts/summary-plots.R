@@ -60,8 +60,8 @@ population_corr <- function(year) {
     ggtitle("Correlation of Live Births and Populations Across Louisiana Parishes") +
     theme_minimal() + 
     theme(
-      text = element_text(family = "Montserrat"),
-      axis.text =  element_text(family = "Montserrat"),
+      # text = element_text(family = "Montserrat"),
+      # axis.text =  element_text(family = "Montserrat"),
       axis.line = element_line())
   
   x <- lm(data=temp, pop_log~births_log)
