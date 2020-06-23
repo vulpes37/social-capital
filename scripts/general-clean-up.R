@@ -92,11 +92,13 @@ aggregate_la_births <- function() {
   # id variable 
   dat$id <- dat$res_par1
 
-  # aggregate by fips and month
+  # aggregate by id and month
   births_by_id_month <- aggregate(data=dat, livebirth ~ del_year_month + id, FUN="sum") 
   names(births_by_id_month) <- c("year_month", "id", "num_births")
-  
   write.csv(births_by_id_month, paste(cd_births, "births_by_id_month.csv", sep=.Platform$file.sep), row.names = FALSE)
+  
+  # aggregate by zipcode and month
+  
 }
 
 # pull out orleans from nccs data 
