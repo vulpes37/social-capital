@@ -1,6 +1,6 @@
 data/
 .DS_Store
-
+*.png
 
 # History files
 .Rhistory
