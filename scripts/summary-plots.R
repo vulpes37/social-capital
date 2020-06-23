@@ -122,4 +122,7 @@ county_timeseries <- function(){
   dev.off()
 }  
 
-
+#  call plots
+population_corr(2004)	
+population_corr("all")
+county_timeseries()
