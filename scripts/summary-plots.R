@@ -46,7 +46,6 @@ population_corr <- function(year) {
   dat$emp_log <- log(dat$total_emp)
   dat$births_log <- log(dat$num_births)
 
-    year  <- "all"
   if(year=="all"){
     temp <- dat
   }else{
