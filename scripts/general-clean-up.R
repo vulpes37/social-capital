@@ -79,7 +79,7 @@ aggregate_la_births <- function() {
   
   cd_births <- paste(cd_data, "la_births_deaths", sep=.Platform$file.sep)
   dat <- read.csv(paste(cd_births, "la_births.csv", sep=.Platform$file.sep), stringsAsFactors = FALSE, check.names = F )
-  
+
   # residents of Louisiana
   dat <- dat[dat$m_state== 19, ] 
   
@@ -93,10 +93,10 @@ aggregate_la_births <- function() {
   dat$id <- dat$res_par1
 
   # aggregate by fips and month
-  births_by_fips_month <- aggregate(data=dat, livebirth ~ del_year_month + id, FUN="sum") 
-  names(births_by_fips_month) <- c("year_month", "id", "num_births")
+  births_by_id_month <- aggregate(data=dat, livebirth ~ del_year_month + id, FUN="sum") 
+  names(births_by_id_month) <- c("year_month", "id", "num_births")
   
-  write.csv(births_by_fips_month, paste(cd_births, "births_by_id_month.csv", sep=.Platform$file.sep), row.names = FALSE)
+  write.csv(births_by_id_month, paste(cd_births, "births_by_id_month.csv", sep=.Platform$file.sep), row.names = FALSE)
 }
 
 # pull out orleans from nccs data 
